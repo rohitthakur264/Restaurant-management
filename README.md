@@ -126,14 +126,4 @@ docker exec -it <app-container-id> node utils/seedData.js
 - **Icons**: Font Awesome 6
 - **Fonts**: Inter + Playfair Display (Google Fonts)
 
----
 
-## ☁️ Cloud 5.0 Principles Applied
-
-1. **Microservices**: Each route module (auth, menu, orders, etc.) is an independent service
-2. **API-First**: RESTful JSON APIs consumed by the frontend
-3. **Secure Auth**: JWT tokens + role-based middleware
-4. **Logging**: Daily request logs in `/logs` directory
-5. **Docker-Ready**: Containerized with `docker-compose`
-6. **Scalable**: Stateless Express app, separate DB layer
-7. **Environment Config**: `.env` for all secrets & configuration
