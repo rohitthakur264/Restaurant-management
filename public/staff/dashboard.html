@@ -1,0 +1,94 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Staff Dashboard — Flavour Haven</title>
+    <link rel="stylesheet" href="/css/style.css">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css">
+</head>
+
+<body>
+    <div class="app-container">
+        <aside class="sidebar">
+            <div class="sidebar-brand">
+                <h2>🍽️ Flavour Haven</h2><small>Staff Portal</small>
+            </div>
+            <nav class="sidebar-nav">
+                <a href="/staff/dashboard.html" class="active"><i class="fas fa-tachometer-alt"></i> Order Queue</a>
+                <a href="/staff/inventory.html"><i class="fas fa-boxes-stacked"></i> Inventory</a>
+            </nav>
+            <div class="sidebar-footer">
+                <div class="user-info">
+                    <div class="avatar" id="user-avatar">S</div>
+                    <div>
+                        <div class="user-name" id="user-name">Staff</div>
+                        <div class="user-role" id="user-role">staff</div>
+                    </div>
+                </div>
+                <button class="btn btn-outline btn-sm w-full mt-2" onclick="logout()"><i
+                        class="fas fa-sign-out-alt"></i> Logout</button>
+            </div>
+        </aside>
+        <main class="main-content">
+            <div class="topbar">
+                <h1>Order Queue</h1>
+                <div class="topbar-actions">
+                    <select id="order-filter" class="filter-select" onchange="loadStaffDashboard()">
+                        <option value="">All Statuses</option>
+                        <option value="pending">Pending</option>
+                        <option value="confirmed">Confirmed</option>
+                        <option value="preparing">Preparing</option>
+                        <option value="ready">Ready</option>
+                        <option value="delivered">Delivered</option>
+                    </select>
+                </div>
+            </div>
+            <div class="page-content">
+                <!-- Stats -->
+                <div class="stats-grid">
+                    <div class="stat-card yellow">
+                        <div class="stat-icon"><i class="fas fa-clock"></i></div>
+                        <div class="stat-info">
+                            <h3 id="stat-pending">0</h3>
+                            <p>Pending Orders</p>
+                        </div>
+                    </div>
+                    <div class="stat-card orange">
+                        <div class="stat-icon"><i class="fas fa-fire"></i></div>
+                        <div class="stat-info">
+                            <h3 id="stat-preparing">0</h3>
+                            <p>Preparing</p>
+                        </div>
+                    </div>
+                    <div class="stat-card green">
+                        <div class="stat-icon"><i class="fas fa-bell"></i></div>
+                        <div class="stat-info">
+                            <h3 id="stat-ready">0</h3>
+                            <p>Ready to Serve</p>
+                        </div>
+                    </div>
+                    <div class="stat-card blue">
+                        <div class="stat-icon"><i class="fas fa-calendar-day"></i></div>
+                        <div class="stat-info">
+                            <h3 id="stat-today">0</h3>
+                            <p>Today's Orders</p>
+                        </div>
+                    </div>
+                </div>
+                <p class="text-muted mb-2"><i class="fas fa-sync-alt"></i> Auto-refreshes every 8 seconds</p>
+                <div id="order-queue">
+                    <div class="loading-spinner">
+                        <div class="spinner"></div>
+                    </div>
+                </div>
+            </div>
+        </main>
+    </div>
+    <script src="/js/utils.js"></script>
+    <script src="/js/staff.js"></script>
+    <script>if (requireAuth(['staff', 'admin'])) startStaffPolling();</script>
+</body>
+
+</html>

@@ -1,0 +1,455 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Room Booking — Flavour Haven</title>
+    <link rel="stylesheet" href="/css/style.css">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css">
+    <style>
+        .room-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(300px, 1fr));
+            gap: 20px;
+        }
+
+        .room-card {
+            background: var(--bg-card);
+            border: 1px solid var(--border);
+            border-radius: var(--radius);
+            overflow: hidden;
+            transition: var(--transition);
+        }
+
+        .room-card:hover {
+            transform: translateY(-4px);
+            box-shadow: var(--shadow);
+            border-color: rgba(230, 126, 34, 0.3);
+        }
+
+        .room-card-img {
+            height: 160px;
+            background: linear-gradient(135deg, #1a1f2e 0%, #2c3e50 100%);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 3.5rem;
+            position: relative;
+        }
+
+        .room-card-img .room-type-badge {
+            position: absolute;
+            top: 12px;
+            left: 12px;
+        }
+
+        .room-card-img .avail-badge {
+            position: absolute;
+            top: 12px;
+            right: 12px;
+        }
+
+        .room-card-body {
+            padding: 18px;
+        }
+
+        .room-card-body h3 {
+            font-family: 'Inter', sans-serif;
+            font-weight: 600;
+            font-size: 1.1rem;
+            margin-bottom: 6px;
+        }
+
+        .room-card-body .room-meta {
+            display: flex;
+            gap: 12px;
+            flex-wrap: wrap;
+            margin: 10px 0;
+            font-size: 0.8rem;
+            color: var(--text-muted);
+        }
+
+        .room-card-body .room-meta span {
+            display: flex;
+            align-items: center;
+            gap: 4px;
+        }
+
+        .amenity-tags {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 6px;
+            margin: 10px 0;
+        }
+
+        .amenity-tag {
+            background: rgba(26, 188, 156, 0.1);
+            color: var(--accent);
+            padding: 3px 10px;
+            border-radius: 20px;
+            font-size: 0.7rem;
+            font-weight: 500;
+        }
+
+        .room-card-footer {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            padding-top: 14px;
+            border-top: 1px solid var(--border);
+        }
+
+        .room-price {
+            font-size: 1.3rem;
+            font-weight: 700;
+            color: var(--primary);
+        }
+
+        .room-price small {
+            font-size: 0.7rem;
+            font-weight: 400;
+            color: var(--text-muted);
+        }
+
+        .booking-timeline {
+            display: flex;
+            align-items: center;
+            gap: 0;
+            margin: 16px 0;
+        }
+
+        .bt-step {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            flex: 1;
+            position: relative;
+        }
+
+        .bt-step::after {
+            content: '';
+            position: absolute;
+            top: 16px;
+            left: 50%;
+            width: 100%;
+            height: 2px;
+            background: var(--border);
+            z-index: 0;
+        }
+
+        .bt-step:last-child::after {
+            display: none;
+        }
+
+        .bt-dot {
+            width: 32px;
+            height: 32px;
+            border-radius: 50%;
+            background: var(--border);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 0.7rem;
+            z-index: 1;
+            transition: var(--transition);
+        }
+
+        .bt-step.active .bt-dot {
+            background: var(--primary);
+            box-shadow: 0 0 12px rgba(230, 126, 34, 0.4);
+            color: #fff;
+        }
+
+        .bt-step.done .bt-dot {
+            background: var(--success);
+            color: #fff;
+        }
+
+        .bt-label {
+            font-size: 0.68rem;
+            margin-top: 8px;
+            color: var(--text-muted);
+        }
+    </style>
+</head>
+
+<body>
+    <div class="app-container">
+        <aside class="sidebar">
+            <div class="sidebar-brand">
+                <h2>🍽️ Flavour Haven</h2><small>Customer Portal</small>
+            </div>
+            <nav class="sidebar-nav">
+                <a href="/customer/menu.html"><i class="fas fa-utensils"></i> Menu</a>
+                <a href="/customer/orders.html"><i class="fas fa-clipboard-list"></i> My Orders</a>
+                <a href="/customer/billing.html"><i class="fas fa-file-invoice-dollar"></i> Billing</a>
+                <a href="/customer/rooms.html" class="active"><i class="fas fa-bed"></i> Room Booking</a>
+            </nav>
+            <div class="sidebar-footer">
+                <div class="user-info">
+                    <div class="avatar" id="user-avatar">C</div>
+                    <div>
+                        <div class="user-name" id="user-name">Customer</div>
+                        <div class="user-role" id="user-role">customer</div>
+                    </div>
+                </div>
+                <button class="btn btn-outline btn-sm w-full mt-2" onclick="logout()"><i
+                        class="fas fa-sign-out-alt"></i> Logout</button>
+            </div>
+        </aside>
+
+        <main class="main-content">
+            <div class="topbar">
+                <h1>Room Booking</h1>
+                <div class="topbar-actions">
+                    <button class="btn btn-outline btn-sm" onclick="showTab('rooms')">🏨 Available Rooms</button>
+                    <button class="btn btn-primary btn-sm" onclick="showTab('mybookings')">📋 My Bookings</button>
+                </div>
+            </div>
+            <div class="page-content">
+                <!-- Available Rooms Tab -->
+                <div id="tab-rooms">
+                    <div class="search-bar">
+                        <div class="search-wrapper">
+                            <i class="fas fa-search"></i>
+                            <input type="text" id="room-search" class="search-input" placeholder="Search rooms..."
+                                oninput="loadRooms()">
+                        </div>
+                        <select id="room-type-filter" class="filter-select" onchange="loadRooms()">
+                            <option value="">All Types</option>
+                            <option value="standard">Standard</option>
+                            <option value="deluxe">Deluxe</option>
+                            <option value="suite">Suite</option>
+                            <option value="premium-suite">Premium Suite</option>
+                            <option value="penthouse">Penthouse</option>
+                        </select>
+                        <select id="room-avail-filter" class="filter-select" onchange="loadRooms()">
+                            <option value="">All Rooms</option>
+                            <option value="true" selected>✅ Available</option>
+                            <option value="false">🔴 Unavailable</option>
+                        </select>
+                    </div>
+                    <div id="room-grid" class="room-grid">
+                        <div class="loading-spinner">
+                            <div class="spinner"></div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- My Bookings Tab -->
+                <div id="tab-mybookings" style="display:none">
+                    <div id="my-bookings">
+                        <div class="loading-spinner">
+                            <div class="spinner"></div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </main>
+
+        <!-- Booking Modal -->
+        <div class="modal-overlay" id="booking-modal">
+            <div class="modal">
+                <div class="modal-header">
+                    <h3>Book Room <span id="bk-room-number"></span></h3>
+                    <button class="modal-close" onclick="closeBookingModal()">✕</button>
+                </div>
+                <form class="modal-body" onsubmit="submitBooking(event)">
+                    <input type="hidden" id="bk-room-id">
+                    <div class="form-row">
+                        <div class="form-group">
+                            <label><i class="fas fa-calendar-check"></i> Check-In Date</label>
+                            <input type="date" id="bk-checkin" class="form-control" required>
+                        </div>
+                        <div class="form-group">
+                            <label><i class="fas fa-calendar-times"></i> Check-Out Date</label>
+                            <input type="date" id="bk-checkout" class="form-control" required>
+                        </div>
+                    </div>
+                    <div class="form-row">
+                        <div class="form-group">
+                            <label><i class="fas fa-users"></i> Number of Guests</label>
+                            <input type="number" id="bk-guests" class="form-control" min="1" value="1" required>
+                        </div>
+                        <div class="form-group">
+                            <label><i class="fas fa-indian-rupee-sign"></i> Price/Night</label>
+                            <input type="text" id="bk-price" class="form-control" readonly>
+                        </div>
+                    </div>
+                    <div class="form-group">
+                        <label><i class="fas fa-comment"></i> Special Requests</label>
+                        <textarea id="bk-requests" class="form-control" rows="2"
+                            placeholder="Any special requirements..."></textarea>
+                    </div>
+                    <div id="bk-summary" class="card mb-2" style="background:var(--bg-dark);padding:14px">
+                        <p class="text-muted" style="font-size:0.85rem">Select dates to see booking summary</p>
+                    </div>
+                    <div class="modal-footer" style="padding:0;border:none;margin-top:12px">
+                        <button type="button" class="btn btn-outline" onclick="closeBookingModal()">Cancel</button>
+                        <button type="submit" class="btn btn-primary"><i class="fas fa-check"></i> Confirm
+                            Booking</button>
+                    </div>
+                </form>
+            </div>
+        </div>
+    </div>
+
+    <script src="/js/utils.js"></script>
+    <script>
+        let currentTab = 'rooms';
+        function showTab(tab) {
+            currentTab = tab;
+            document.getElementById('tab-rooms').style.display = tab === 'rooms' ? 'block' : 'none';
+            document.getElementById('tab-mybookings').style.display = tab === 'mybookings' ? 'block' : 'none';
+            if (tab === 'rooms') loadRooms();
+            else loadMyBookings();
+        }
+
+        const roomTypeEmoji = { 'standard': '🛏️', 'deluxe': '🌟', 'suite': '👑', 'premium-suite': '💎', 'penthouse': '🏰' };
+
+        async function loadRooms() {
+            const search = document.getElementById('room-search')?.value || '';
+            const type = document.getElementById('room-type-filter')?.value || '';
+            const avail = document.getElementById('room-avail-filter')?.value || '';
+            try {
+                let url = `/rooms?search=${search}`;
+                if (avail) url += `&available=${avail}`;
+                if (type) url += `&type=${type}`;
+                const rooms = await api(url);
+                const grid = document.getElementById('room-grid');
+                if (!rooms.length) { grid.innerHTML = '<div class="empty-state"><i class="fas fa-bed"></i><h3>No rooms found</h3><p>Try changing the filters</p></div>'; return; }
+                grid.innerHTML = rooms.map(r => `
+          <div class="room-card" style="${!r.isAvailable ? 'opacity:0.7' : ''}">
+            <div class="room-card-img">
+              ${roomTypeEmoji[r.type] || '🏨'}
+              <span class="room-type-badge badge badge-preparing">${r.type}</span>
+              <span class="avail-badge badge ${r.isAvailable ? 'badge-delivered' : 'badge-cancelled'}">${r.isAvailable ? 'Available' : 'Unavailable'}</span>
+            </div>
+            <div class="room-card-body">
+              <h3>Room ${r.roomNumber}</h3>
+              <p style="font-size:0.82rem;color:var(--text-muted);margin-bottom:8px">${r.description || 'Comfortable room with all amenities'}</p>
+              <div class="room-meta">
+                <span><i class="fas fa-layer-group"></i> Floor ${r.floor}</span>
+                <span><i class="fas fa-users"></i> Max ${r.capacity} guests</span>
+              </div>
+              ${r.amenities?.length ? `<div class="amenity-tags">${r.amenities.map(a => `<span class="amenity-tag">${a}</span>`).join('')}</div>` : ''}
+              <div class="room-card-footer">
+                <span class="room-price">${formatCurrency(r.pricePerNight)} <small>/night</small></span>
+                ${r.isAvailable ? `<button class="btn btn-primary btn-sm" onclick='openBookingModal(${JSON.stringify({ id: r._id, number: r.roomNumber, price: r.pricePerNight, capacity: r.capacity })})'>
+                  <i class="fas fa-calendar-plus"></i> Book
+                </button>` : `<span class="badge badge-cancelled" style="font-size:0.75rem"><i class="fas fa-lock"></i> Occupied</span>`}
+              </div>
+            </div>
+          </div>
+        `).join('');
+            } catch (err) { showToast(err.message, 'error'); }
+        }
+
+        function openBookingModal(room) {
+            document.getElementById('bk-room-id').value = room.id;
+            document.getElementById('bk-room-number').textContent = room.number;
+            document.getElementById('bk-price').value = formatCurrency(room.price);
+            document.getElementById('bk-guests').max = room.capacity;
+            const today = new Date().toISOString().split('T')[0];
+            const tomorrow = new Date(Date.now() + 86400000).toISOString().split('T')[0];
+            document.getElementById('bk-checkin').value = today;
+            document.getElementById('bk-checkin').min = today;
+            document.getElementById('bk-checkout').value = tomorrow;
+            document.getElementById('bk-checkout').min = tomorrow;
+            updateBookingSummary(room.price);
+            document.getElementById('bk-checkin').onchange = () => updateBookingSummary(room.price);
+            document.getElementById('bk-checkout').onchange = () => updateBookingSummary(room.price);
+            document.getElementById('booking-modal').classList.add('active');
+        }
+
+        function updateBookingSummary(pricePerNight) {
+            const ci = new Date(document.getElementById('bk-checkin').value);
+            const co = new Date(document.getElementById('bk-checkout').value);
+            if (co <= ci) { document.getElementById('bk-summary').innerHTML = '<p class="text-danger" style="font-size:0.85rem">Check-out must be after check-in</p>'; return; }
+            const nights = Math.max(1, Math.ceil((co - ci) / 86400000));
+            const total = nights * pricePerNight;
+            document.getElementById('bk-summary').innerHTML = `
+        <div class="d-flex justify-between" style="font-size:0.9rem"><span>${nights} night${nights > 1 ? 's' : ''} × ${formatCurrency(pricePerNight)}</span><span class="text-primary" style="font-weight:700;font-size:1.1rem">${formatCurrency(total)}</span></div>
+      `;
+        }
+
+        function closeBookingModal() { document.getElementById('booking-modal').classList.remove('active'); }
+
+        async function submitBooking(e) {
+            e.preventDefault();
+            const roomId = document.getElementById('bk-room-id').value;
+            const checkIn = document.getElementById('bk-checkin').value;
+            const checkOut = document.getElementById('bk-checkout').value;
+            const guests = Number(document.getElementById('bk-guests').value);
+            const specialRequests = document.getElementById('bk-requests').value;
+            try {
+                await api('/rooms/bookings', { method: 'POST', body: { roomId, checkIn, checkOut, guests, specialRequests } });
+                showToast('Room booked successfully! 🎉');
+                closeBookingModal();
+                showTab('mybookings');
+            } catch (err) { showToast(err.message, 'error'); }
+        }
+
+        async function loadMyBookings() {
+            try {
+                const bookings = await api('/rooms/bookings/my');
+                const container = document.getElementById('my-bookings');
+                if (!bookings.length) { container.innerHTML = '<div class="empty-state"><i class="fas fa-suitcase"></i><h3>No bookings yet</h3><p>Browse available rooms and make a booking</p></div>'; return; }
+                container.innerHTML = bookings.map(b => {
+                    const statusSteps = ['booked', 'checked-in', 'checked-out'];
+                    const icons = ['fa-calendar-check', 'fa-door-open', 'fa-door-closed'];
+                    const curIdx = statusSteps.indexOf(b.status);
+                    const isCancelled = b.status === 'cancelled';
+                    return `
+          <div class="card mb-2">
+            <div class="d-flex justify-between align-center flex-wrap gap-2">
+              <div>
+                <h3 style="font-family:'Inter',sans-serif;font-size:1.1rem">🏨 Room ${b.roomNumber} — ${b.room?.type || ''}</h3>
+                <span class="text-muted" style="font-size:0.8rem">Booking #${b._id.slice(-6).toUpperCase()}</span>
+              </div>
+              <div class="d-flex align-center gap-2">
+                ${statusBadge(b.status)}
+                <span class="badge badge-${b.paymentStatus}">${b.paymentStatus}</span>
+                <span class="room-price">${formatCurrency(b.totalAmount)}</span>
+              </div>
+            </div>
+            <div class="divider"></div>
+            <div class="room-meta" style="font-size:0.85rem;color:var(--text-secondary);display:flex;gap:24px;flex-wrap:wrap">
+              <span><i class="fas fa-calendar-check text-primary"></i> Check-In: <strong>${new Date(b.checkIn).toLocaleDateString('en-IN')}</strong></span>
+              <span><i class="fas fa-calendar-times text-primary"></i> Check-Out: <strong>${new Date(b.checkOut).toLocaleDateString('en-IN')}</strong></span>
+              <span><i class="fas fa-moon text-primary"></i> ${b.totalNights} night${b.totalNights > 1 ? 's' : ''}</span>
+              <span><i class="fas fa-users text-primary"></i> ${b.guests} guest${b.guests > 1 ? 's' : ''}</span>
+              ${b.checkedInAt ? `<span><i class="fas fa-clock text-success"></i> Checked in: ${formatDate(b.checkedInAt)}</span>` : ''}
+              ${b.checkedOutAt ? `<span><i class="fas fa-clock text-danger"></i> Checked out: ${formatDate(b.checkedOutAt)}</span>` : ''}
+            </div>
+            ${!isCancelled ? `
+              <div class="booking-timeline mt-2">
+                ${statusSteps.map((s, i) => `
+                  <div class="bt-step ${i < curIdx ? 'done' : i === curIdx ? 'active' : ''}">
+                    <div class="bt-dot"><i class="fas ${icons[i]}"></i></div>
+                    <span class="bt-label">${s}</span>
+                  </div>
+                `).join('')}
+              </div>
+            ` : '<p class="text-danger mt-2"><i class="fas fa-times-circle"></i> Booking Cancelled</p>'}
+            ${b.status === 'booked' ? `<button class="btn btn-danger btn-sm mt-2" onclick="cancelMyBooking('${b._id}')"><i class="fas fa-times"></i> Cancel Booking</button>` : ''}
+          </div>`;
+                }).join('');
+            } catch (err) { showToast(err.message, 'error'); }
+        }
+
+        async function cancelMyBooking(id) {
+            if (!confirm('Cancel this booking?')) return;
+            try {
+                await api(`/rooms/bookings/${id}/cancel`, { method: 'PATCH' });
+                showToast('Booking cancelled');
+                loadMyBookings();
+            } catch (err) { showToast(err.message, 'error'); }
+        }
+
+        if (requireAuth(['customer'])) loadRooms();
+    </script>
+</body>
+
+</html>

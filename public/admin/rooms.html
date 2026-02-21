@@ -1,0 +1,367 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Room Management — Flavour Haven</title>
+    <link rel="stylesheet" href="/css/style.css">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css">
+</head>
+
+<body>
+    <div class="app-container">
+        <aside class="sidebar">
+            <div class="sidebar-brand">
+                <h2>🍽️ Flavour Haven</h2><small>Admin Console</small>
+            </div>
+            <nav class="sidebar-nav">
+                <a href="/admin/dashboard.html"><i class="fas fa-chart-line"></i> Dashboard</a>
+                <a href="/admin/menu-manage.html"><i class="fas fa-utensils"></i> Menu</a>
+                <a href="/admin/employees.html"><i class="fas fa-users"></i> Employees</a>
+                <a href="/admin/rooms.html" class="active"><i class="fas fa-bed"></i> Rooms</a>
+                <a href="/admin/reports.html"><i class="fas fa-file-alt"></i> Reports</a>
+                <a href="/staff/dashboard.html"><i class="fas fa-clipboard-list"></i> Order Queue</a>
+                <a href="/staff/inventory.html"><i class="fas fa-boxes-stacked"></i> Inventory</a>
+            </nav>
+            <div class="sidebar-footer">
+                <div class="user-info">
+                    <div class="avatar" id="user-avatar">A</div>
+                    <div>
+                        <div class="user-name" id="user-name">Admin</div>
+                        <div class="user-role" id="user-role">admin</div>
+                    </div>
+                </div>
+                <button class="btn btn-outline btn-sm w-full mt-2" onclick="logout()"><i
+                        class="fas fa-sign-out-alt"></i> Logout</button>
+            </div>
+        </aside>
+        <main class="main-content">
+            <div class="topbar">
+                <h1>Room & Booking Management</h1>
+                <div class="topbar-actions">
+                    <button class="btn btn-outline btn-sm" onclick="showMgmtTab('rooms')">🏨 Rooms</button>
+                    <button class="btn btn-primary btn-sm" onclick="showMgmtTab('bookings')">📋 Bookings</button>
+                    <button class="btn btn-success btn-sm" onclick="showAddRoomModal()"><i class="fas fa-plus"></i> Add
+                        Room</button>
+                </div>
+            </div>
+            <div class="page-content">
+                <!-- Stats -->
+                <div class="stats-grid">
+                    <div class="stat-card blue">
+                        <div class="stat-icon"><i class="fas fa-bed"></i></div>
+                        <div class="stat-info">
+                            <h3 id="stat-total-rooms">0</h3>
+                            <p>Total Rooms</p>
+                        </div>
+                    </div>
+                    <div class="stat-card green">
+                        <div class="stat-icon"><i class="fas fa-door-open"></i></div>
+                        <div class="stat-info">
+                            <h3 id="stat-available">0</h3>
+                            <p>Available</p>
+                        </div>
+                    </div>
+                    <div class="stat-card orange">
+                        <div class="stat-icon"><i class="fas fa-calendar-check"></i></div>
+                        <div class="stat-info">
+                            <h3 id="stat-active-bookings">0</h3>
+                            <p>Active Bookings</p>
+                        </div>
+                    </div>
+                    <div class="stat-card teal">
+                        <div class="stat-icon"><i class="fas fa-indian-rupee-sign"></i></div>
+                        <div class="stat-info">
+                            <h3 id="stat-room-revenue">₹0</h3>
+                            <p>Room Revenue</p>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Rooms Tab -->
+                <div id="mgmt-rooms">
+                    <div id="rooms-table">
+                        <div class="loading-spinner">
+                            <div class="spinner"></div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Bookings Tab -->
+                <div id="mgmt-bookings" style="display:none">
+                    <div class="search-bar mb-2">
+                        <select id="booking-status-filter" class="filter-select" onchange="loadBookings()">
+                            <option value="">All Statuses</option>
+                            <option value="booked">Booked</option>
+                            <option value="checked-in">Checked In</option>
+                            <option value="checked-out">Checked Out</option>
+                            <option value="cancelled">Cancelled</option>
+                        </select>
+                    </div>
+                    <div id="bookings-table">
+                        <div class="loading-spinner">
+                            <div class="spinner"></div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </main>
+
+        <!-- Add/Edit Room Modal -->
+        <div class="modal-overlay" id="room-modal">
+            <div class="modal">
+                <div class="modal-header">
+                    <h3 id="room-modal-title">Add Room</h3>
+                    <button class="modal-close" onclick="closeRoomModal()">✕</button>
+                </div>
+                <form class="modal-body" id="room-form" onsubmit="saveRoom(event)">
+                    <input type="hidden" id="r-id">
+                    <div class="form-row">
+                        <div class="form-group">
+                            <label>Room Number</label>
+                            <input type="text" id="r-number" class="form-control" placeholder="e.g. 101" required>
+                        </div>
+                        <div class="form-group">
+                            <label>Room Type</label>
+                            <select id="r-type" class="form-control">
+                                <option value="standard">Standard</option>
+                                <option value="deluxe">Deluxe</option>
+                                <option value="suite">Suite</option>
+                                <option value="premium-suite">Premium Suite</option>
+                                <option value="penthouse">Penthouse</option>
+                            </select>
+                        </div>
+                    </div>
+                    <div class="form-row">
+                        <div class="form-group">
+                            <label>Floor</label>
+                            <input type="number" id="r-floor" class="form-control" min="1" value="1">
+                        </div>
+                        <div class="form-group">
+                            <label>Capacity (guests)</label>
+                            <input type="number" id="r-capacity" class="form-control" min="1" value="2">
+                        </div>
+                    </div>
+                    <div class="form-group">
+                        <label>Price Per Night (₹)</label>
+                        <input type="number" id="r-price" class="form-control" min="0" required>
+                    </div>
+                    <div class="form-group">
+                        <label>Description</label>
+                        <textarea id="r-desc" class="form-control" rows="2"></textarea>
+                    </div>
+                    <div class="form-group">
+                        <label>Amenities (comma separated)</label>
+                        <input type="text" id="r-amenities" class="form-control"
+                            placeholder="WiFi, AC, TV, Mini Bar, Balcony">
+                    </div>
+                    <div class="form-group">
+                        <label><input type="checkbox" id="r-available" checked> Available for booking</label>
+                    </div>
+                    <div class="modal-footer" style="padding:0;border:none;margin-top:12px">
+                        <button type="button" class="btn btn-outline" onclick="closeRoomModal()">Cancel</button>
+                        <button type="submit" class="btn btn-primary"><i class="fas fa-save"></i> Save</button>
+                    </div>
+                </form>
+            </div>
+        </div>
+
+        <!-- Checkout Payment Modal -->
+        <div class="modal-overlay" id="checkout-modal">
+            <div class="modal">
+                <div class="modal-header">
+                    <h3>Check-Out & Payment</h3>
+                    <button class="modal-close"
+                        onclick="document.getElementById('checkout-modal').classList.remove('active')">✕</button>
+                </div>
+                <div class="modal-body">
+                    <input type="hidden" id="co-booking-id">
+                    <p id="co-info" style="margin-bottom:16px"></p>
+                    <div class="form-group">
+                        <label><i class="fas fa-credit-card"></i> Payment Method</label>
+                        <select id="co-method" class="form-control">
+                            <option value="cash">Cash</option>
+                            <option value="card">Card</option>
+                            <option value="upi">UPI</option>
+                            <option value="online">Online</option>
+                        </select>
+                    </div>
+                    <div class="modal-footer" style="padding:0;border:none;margin-top:12px">
+                        <button class="btn btn-outline"
+                            onclick="document.getElementById('checkout-modal').classList.remove('active')">Cancel</button>
+                        <button class="btn btn-success" onclick="confirmCheckout()"><i class="fas fa-check-circle"></i>
+                            Confirm Check-Out & Pay</button>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script src="/js/utils.js"></script>
+    <script>
+        let mgmtTab = 'rooms';
+        function showMgmtTab(tab) {
+            mgmtTab = tab;
+            document.getElementById('mgmt-rooms').style.display = tab === 'rooms' ? 'block' : 'none';
+            document.getElementById('mgmt-bookings').style.display = tab === 'bookings' ? 'block' : 'none';
+            if (tab === 'rooms') loadRoomsMgmt();
+            else loadBookings();
+        }
+
+        // ---- Room Stats ----
+        async function loadStats() {
+            try {
+                const rooms = await api('/rooms');
+                const bookings = await api('/rooms/bookings/all');
+                document.getElementById('stat-total-rooms').textContent = rooms.length;
+                document.getElementById('stat-available').textContent = rooms.filter(r => r.isAvailable).length;
+                document.getElementById('stat-active-bookings').textContent = bookings.filter(b => b.status === 'booked' || b.status === 'checked-in').length;
+                const revenue = bookings.filter(b => b.paymentStatus === 'paid').reduce((s, b) => s + b.totalAmount, 0);
+                document.getElementById('stat-room-revenue').textContent = formatCurrency(revenue);
+            } catch (err) { }
+        }
+
+        // ---- Rooms Table ----
+        async function loadRoomsMgmt() {
+            try {
+                const rooms = await api('/rooms');
+                const container = document.getElementById('rooms-table');
+                container.innerHTML = `<div class="table-container"><table>
+          <thead><tr><th>Room</th><th>Type</th><th>Floor</th><th>Capacity</th><th>Price/Night</th><th>Amenities</th><th>Status</th><th>Actions</th></tr></thead>
+          <tbody>${rooms.map(r => `<tr>
+            <td><strong>${r.roomNumber}</strong></td>
+            <td><span class="badge badge-preparing">${r.type}</span></td>
+            <td>${r.floor}</td>
+            <td>${r.capacity}</td>
+            <td class="text-primary">${formatCurrency(r.pricePerNight)}</td>
+            <td style="font-size:0.78rem">${(r.amenities || []).join(', ') || '—'}</td>
+            <td>${r.isAvailable ? '<span class="badge badge-delivered">Available</span>' : '<span class="badge badge-cancelled">Occupied</span>'}</td>
+            <td><div class="d-flex gap-2" style="gap:6px">
+              <button class="btn btn-info btn-sm" onclick="editRoom('${r._id}')"><i class="fas fa-edit"></i></button>
+              <button class="btn btn-danger btn-sm" onclick="deleteRoom('${r._id}')"><i class="fas fa-trash"></i></button>
+            </div></td>
+          </tr>`).join('')}</tbody>
+        </table></div>`;
+            } catch (err) { showToast(err.message, 'error'); }
+        }
+
+        function showAddRoomModal() {
+            document.getElementById('room-modal-title').textContent = 'Add Room';
+            document.getElementById('room-form').reset();
+            document.getElementById('r-id').value = '';
+            document.getElementById('r-available').checked = true;
+            document.getElementById('room-modal').classList.add('active');
+        }
+
+        async function editRoom(id) {
+            try {
+                const r = await api(`/rooms/${id}`);
+                document.getElementById('room-modal-title').textContent = 'Edit Room';
+                document.getElementById('r-id').value = r._id;
+                document.getElementById('r-number').value = r.roomNumber;
+                document.getElementById('r-type').value = r.type;
+                document.getElementById('r-floor').value = r.floor;
+                document.getElementById('r-capacity').value = r.capacity;
+                document.getElementById('r-price').value = r.pricePerNight;
+                document.getElementById('r-desc').value = r.description;
+                document.getElementById('r-amenities').value = (r.amenities || []).join(', ');
+                document.getElementById('r-available').checked = r.isAvailable;
+                document.getElementById('room-modal').classList.add('active');
+            } catch (err) { showToast(err.message, 'error'); }
+        }
+
+        async function saveRoom(e) {
+            e.preventDefault();
+            const id = document.getElementById('r-id').value;
+            const data = {
+                roomNumber: document.getElementById('r-number').value,
+                type: document.getElementById('r-type').value,
+                floor: Number(document.getElementById('r-floor').value),
+                capacity: Number(document.getElementById('r-capacity').value),
+                pricePerNight: Number(document.getElementById('r-price').value),
+                description: document.getElementById('r-desc').value,
+                amenities: document.getElementById('r-amenities').value.split(',').map(a => a.trim()).filter(Boolean),
+                isAvailable: document.getElementById('r-available').checked
+            };
+            try {
+                if (id) { await api(`/rooms/${id}`, { method: 'PUT', body: data }); showToast('Room updated!'); }
+                else { await api('/rooms', { method: 'POST', body: data }); showToast('Room created!'); }
+                closeRoomModal();
+                loadRoomsMgmt();
+                loadStats();
+            } catch (err) { showToast(err.message, 'error'); }
+        }
+
+        async function deleteRoom(id) {
+            if (!confirm('Delete this room?')) return;
+            try { await api(`/rooms/${id}`, { method: 'DELETE' }); showToast('Room deleted'); loadRoomsMgmt(); loadStats(); }
+            catch (err) { showToast(err.message, 'error'); }
+        }
+
+        function closeRoomModal() { document.getElementById('room-modal').classList.remove('active'); }
+
+        // ---- Bookings Table ----
+        async function loadBookings() {
+            const status = document.getElementById('booking-status-filter')?.value || '';
+            try {
+                let url = '/rooms/bookings/all';
+                if (status) url += `?status=${status}`;
+                const bookings = await api(url);
+                const container = document.getElementById('bookings-table');
+                if (!bookings.length) { container.innerHTML = '<div class="empty-state"><i class="fas fa-calendar"></i><h3>No bookings</h3></div>'; return; }
+                container.innerHTML = `<div class="table-container"><table>
+          <thead><tr><th>Booking</th><th>Room</th><th>Guest</th><th>Check-In</th><th>Check-Out</th><th>Nights</th><th>Amount</th><th>Status</th><th>Payment</th><th>Actions</th></tr></thead>
+          <tbody>${bookings.map(b => `<tr>
+            <td><strong>#${b._id.slice(-6).toUpperCase()}</strong></td>
+            <td>${b.roomNumber} <span class="badge badge-preparing" style="font-size:0.6rem">${b.room?.type || ''}</span></td>
+            <td>${b.customer?.name || 'N/A'}<br><small class="text-muted">${b.customer?.email || ''}</small></td>
+            <td>${new Date(b.checkIn).toLocaleDateString('en-IN')}</td>
+            <td>${new Date(b.checkOut).toLocaleDateString('en-IN')}</td>
+            <td>${b.totalNights}</td>
+            <td class="text-primary"><strong>${formatCurrency(b.totalAmount)}</strong></td>
+            <td>${statusBadge(b.status)}</td>
+            <td><span class="badge badge-${b.paymentStatus}">${b.paymentStatus}</span></td>
+            <td><div class="d-flex gap-2" style="gap:6px">
+              ${b.status === 'booked' ? `<button class="btn btn-success btn-sm" onclick="doCheckIn('${b._id}')"><i class="fas fa-door-open"></i> Check In</button>` : ''}
+              ${b.status === 'checked-in' ? `<button class="btn btn-info btn-sm" onclick="openCheckout('${b._id}','${b.roomNumber}',${b.totalAmount})"><i class="fas fa-door-closed"></i> Check Out</button>` : ''}
+              ${(b.status === 'booked' || b.status === 'checked-in') ? `<button class="btn btn-danger btn-sm" onclick="doCancel('${b._id}')"><i class="fas fa-times"></i></button>` : ''}
+            </div></td>
+          </tr>`).join('')}</tbody>
+        </table></div>`;
+            } catch (err) { showToast(err.message, 'error'); }
+        }
+
+        async function doCheckIn(id) {
+            try { await api(`/rooms/bookings/${id}/checkin`, { method: 'PATCH' }); showToast('Guest checked in!'); loadBookings(); loadStats(); }
+            catch (err) { showToast(err.message, 'error'); }
+        }
+
+        function openCheckout(id, room, amount) {
+            document.getElementById('co-booking-id').value = id;
+            document.getElementById('co-info').innerHTML = `<strong>Room ${room}</strong> — Total: <span class="text-primary" style="font-size:1.2rem;font-weight:700">${formatCurrency(amount)}</span>`;
+            document.getElementById('checkout-modal').classList.add('active');
+        }
+
+        async function confirmCheckout() {
+            const id = document.getElementById('co-booking-id').value;
+            const method = document.getElementById('co-method').value;
+            try {
+                await api(`/rooms/bookings/${id}/checkout`, { method: 'PATCH', body: { paymentMethod: method } });
+                showToast('Guest checked out & payment recorded! ✅');
+                document.getElementById('checkout-modal').classList.remove('active');
+                loadBookings(); loadStats();
+            } catch (err) { showToast(err.message, 'error'); }
+        }
+
+        async function doCancel(id) {
+            if (!confirm('Cancel this booking?')) return;
+            try { await api(`/rooms/bookings/${id}/cancel`, { method: 'PATCH' }); showToast('Booking cancelled'); loadBookings(); loadStats(); }
+            catch (err) { showToast(err.message, 'error'); }
+        }
+
+        if (requireAuth(['admin'])) { loadRoomsMgmt(); loadStats(); }
+    </script>
+</body>
+
+</html>

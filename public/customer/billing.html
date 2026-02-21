@@ -1,0 +1,304 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Billing & Payments — Flavour Haven</title>
+    <link rel="stylesheet" href="/css/style.css">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css">
+    <style>
+        .payment-card {
+            background: var(--bg-card);
+            border: 1px solid var(--border);
+            border-radius: var(--radius);
+            padding: 20px;
+            margin-bottom: 16px;
+        }
+
+        .payment-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            flex-wrap: wrap;
+            gap: 10px;
+            margin-bottom: 14px;
+        }
+
+        .payment-header h3 {
+            font-family: 'Inter', sans-serif;
+            font-size: 1rem;
+        }
+
+        .payment-items {
+            display: grid;
+            gap: 8px;
+            margin: 12px 0;
+        }
+
+        .payment-item {
+            display: flex;
+            justify-content: space-between;
+            padding: 8px 12px;
+            background: var(--bg-dark);
+            border-radius: 8px;
+            font-size: 0.85rem;
+        }
+
+        .payment-summary {
+            border-top: 2px solid var(--border);
+            padding-top: 14px;
+            margin-top: 14px;
+        }
+
+        .payment-row {
+            display: flex;
+            justify-content: space-between;
+            padding: 4px 0;
+            font-size: 0.9rem;
+        }
+
+        .payment-row.total {
+            font-size: 1.15rem;
+            font-weight: 700;
+            color: var(--primary);
+            border-top: 1px dashed var(--border);
+            padding-top: 10px;
+            margin-top: 6px;
+        }
+
+        .payment-method-badge {
+            display: inline-flex;
+            align-items: center;
+            gap: 5px;
+            padding: 4px 12px;
+            border-radius: 20px;
+            font-size: 0.75rem;
+            font-weight: 600;
+        }
+
+        .pmb-cash {
+            background: rgba(46, 204, 113, 0.15);
+            color: #2ecc71;
+        }
+
+        .pmb-card {
+            background: rgba(52, 152, 219, 0.15);
+            color: #3498db;
+        }
+
+        .pmb-upi {
+            background: rgba(155, 89, 182, 0.15);
+            color: #9b59b6;
+        }
+
+        .pmb-online {
+            background: rgba(230, 126, 34, 0.15);
+            color: #e67e22;
+        }
+
+        .payment-timeline {
+            display: flex;
+            gap: 16px;
+            flex-wrap: wrap;
+            font-size: 0.8rem;
+            color: var(--text-muted);
+            margin-top: 12px;
+        }
+
+        .payment-timeline span {
+            display: flex;
+            align-items: center;
+            gap: 4px;
+        }
+
+        .summary-cards {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+            gap: 16px;
+            margin-bottom: 24px;
+        }
+
+        .sum-card {
+            background: var(--bg-card);
+            border: 1px solid var(--border);
+            border-radius: var(--radius);
+            padding: 20px;
+            text-align: center;
+        }
+
+        .sum-card h2 {
+            font-family: 'Inter', sans-serif;
+            font-size: 1.6rem;
+            margin: 8px 0 4px;
+        }
+
+        .sum-card p {
+            color: var(--text-muted);
+            font-size: 0.8rem;
+        }
+
+        .sum-card i {
+            font-size: 1.5rem;
+        }
+    </style>
+</head>
+
+<body>
+    <div class="app-container">
+        <aside class="sidebar">
+            <div class="sidebar-brand">
+                <h2>🍽️ Flavour Haven</h2><small>Customer Portal</small>
+            </div>
+            <nav class="sidebar-nav">
+                <a href="/customer/menu.html"><i class="fas fa-utensils"></i> Menu</a>
+                <a href="/customer/orders.html"><i class="fas fa-clipboard-list"></i> My Orders</a>
+                <a href="/customer/billing.html" class="active"><i class="fas fa-file-invoice-dollar"></i> Billing</a>
+                <a href="/customer/rooms.html"><i class="fas fa-bed"></i> Room Booking</a>
+            </nav>
+            <div class="sidebar-footer">
+                <div class="user-info">
+                    <div class="avatar" id="user-avatar">C</div>
+                    <div>
+                        <div class="user-name" id="user-name">Customer</div>
+                        <div class="user-role" id="user-role">customer</div>
+                    </div>
+                </div>
+                <button class="btn btn-outline btn-sm w-full mt-2" onclick="logout()"><i
+                        class="fas fa-sign-out-alt"></i> Logout</button>
+            </div>
+        </aside>
+        <main class="main-content">
+            <div class="topbar">
+                <h1><i class="fas fa-file-invoice-dollar"></i> Billing & Payments</h1>
+            </div>
+            <div class="page-content">
+                <!-- Summary Cards -->
+                <div class="summary-cards" id="payment-summary-cards">
+                    <div class="sum-card">
+                        <i class="fas fa-shopping-bag text-primary"></i>
+                        <h2 id="pc-total-orders">0</h2>
+                        <p>Total Orders</p>
+                    </div>
+                    <div class="sum-card">
+                        <i class="fas fa-indian-rupee-sign" style="color:#2ecc71"></i>
+                        <h2 id="pc-total-spent" style="color:#2ecc71">₹0</h2>
+                        <p>Total Spent</p>
+                    </div>
+                    <div class="sum-card">
+                        <i class="fas fa-check-circle" style="color:#3498db"></i>
+                        <h2 id="pc-paid-orders" style="color:#3498db">0</h2>
+                        <p>Paid Orders</p>
+                    </div>
+                    <div class="sum-card">
+                        <i class="fas fa-clock" style="color:#e67e22"></i>
+                        <h2 id="pc-pending" style="color:#e67e22">0</h2>
+                        <p>Pending Payment</p>
+                    </div>
+                </div>
+
+                <div class="section-header"
+                    style="display:flex;justify-content:space-between;align-items:center;margin-bottom:16px">
+                    <h2 style="font-family:'Inter',sans-serif"><i class="fas fa-receipt text-primary"></i> Payment
+                        History</h2>
+                </div>
+
+                <div id="payment-details">
+                    <div class="loading-spinner">
+                        <div class="spinner"></div>
+                    </div>
+                </div>
+            </div>
+        </main>
+    </div>
+    <script src="/js/utils.js"></script>
+    <script>
+        const paymentMethodIcons = { cash: 'fa-money-bill-wave', card: 'fa-credit-card', upi: 'fa-mobile-screen', online: 'fa-globe' };
+
+        async function loadPaymentDetails() {
+            try {
+                const orders = await api('/orders/my');
+                const delivered = orders.filter(o => o.status === 'delivered');
+                const pending = orders.filter(o => o.status !== 'delivered' && o.status !== 'cancelled');
+                const totalSpent = delivered.reduce((sum, o) => sum + o.total, 0);
+
+                // Update summary cards
+                document.getElementById('pc-total-orders').textContent = orders.length;
+                document.getElementById('pc-total-spent').textContent = formatCurrency(totalSpent);
+                document.getElementById('pc-paid-orders').textContent = delivered.length;
+                document.getElementById('pc-pending').textContent = pending.length;
+
+                const container = document.getElementById('payment-details');
+
+                if (!orders.length) {
+                    container.innerHTML = '<div class="empty-state"><i class="fas fa-receipt"></i><h3>No orders yet</h3><p>Place an order from the <a href="/customer/menu.html">Menu</a> to see payment details here</p></div>';
+                    return;
+                }
+
+                // Sort by date descending
+                const sorted = orders.sort((a, b) => new Date(b.createdAt) - new Date(a.createdAt));
+
+                container.innerHTML = sorted.map(order => {
+                    const isPaid = order.status === 'delivered';
+                    const isCancelled = order.status === 'cancelled';
+                    const subtotal = order.items.reduce((s, i) => s + (i.price * i.quantity), 0);
+                    const gst = subtotal * 0.05;
+                    const serviceCharge = subtotal * 0.02;
+                    const grandTotal = subtotal + gst + serviceCharge;
+
+                    return `<div class="payment-card">
+            <div class="payment-header">
+              <div>
+                <h3>🧾 Order #${order._id.slice(-6).toUpperCase()}</h3>
+                <span class="text-muted" style="font-size:0.78rem">${formatDate(order.createdAt)}</span>
+              </div>
+              <div style="display:flex;align-items:center;gap:10px">
+                ${statusBadge(order.status)}
+                ${isPaid ? '<span class="badge badge-delivered">PAID</span>' : isCancelled ? '<span class="badge badge-cancelled">CANCELLED</span>' : '<span class="badge badge-pending">UNPAID</span>'}
+              </div>
+            </div>
+
+            <div class="payment-items">
+              <div class="payment-item" style="font-weight:600;color:var(--text-muted);font-size:0.75rem">
+                <span>ITEM</span>
+                <span style="display:flex;gap:40px"><span>QTY</span><span>PRICE</span></span>
+              </div>
+              ${order.items.map(item => `
+                <div class="payment-item">
+                  <span>${item.name}</span>
+                  <span style="display:flex;gap:40px">
+                    <span>×${item.quantity}</span>
+                    <span class="text-primary" style="font-weight:600">${formatCurrency(item.price * item.quantity)}</span>
+                  </span>
+                </div>
+              `).join('')}
+            </div>
+
+            <div class="payment-summary">
+              <div class="payment-row"><span>Subtotal</span><span>${formatCurrency(subtotal)}</span></div>
+              <div class="payment-row"><span>GST (5%)</span><span>${formatCurrency(gst)}</span></div>
+              <div class="payment-row"><span>Service Charge (2%)</span><span>${formatCurrency(serviceCharge)}</span></div>
+              <div class="payment-row total"><span>Grand Total</span><span>${formatCurrency(grandTotal)}</span></div>
+            </div>
+
+            ${isPaid ? `
+              <div class="payment-timeline">
+                <span><i class="fas fa-calendar-check text-primary"></i> Ordered: ${formatDate(order.createdAt)}</span>
+                <span><i class="fas fa-check-circle text-success"></i> Delivered: ${formatDate(order.updatedAt)}</span>
+                <span class="payment-method-badge pmb-cash"><i class="fas fa-money-bill-wave"></i> Paid</span>
+              </div>
+            ` : ''}
+
+            ${order.tableNumber ? `<p class="text-muted" style="font-size:0.78rem;margin-top:8px"><i class="fas fa-chair"></i> Table #${order.tableNumber}</p>` : ''}
+          </div>`;
+                }).join('');
+            } catch (err) {
+                showToast(err.message, 'error');
+            }
+        }
+
+        if (requireAuth(['customer'])) loadPaymentDetails();
+    </script>
+</body>
+
+</html>

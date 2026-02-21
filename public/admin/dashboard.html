@@ -1,0 +1,126 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Admin Dashboard — Flavour Haven</title>
+    <link rel="stylesheet" href="/css/style.css">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css">
+    <script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.0/dist/chart.umd.min.js"></script>
+</head>
+
+<body>
+    <div class="app-container">
+        <aside class="sidebar">
+            <div class="sidebar-brand">
+                <h2>🍽️ Flavour Haven</h2><small>Admin Console</small>
+            </div>
+            <nav class="sidebar-nav">
+                <a href="/admin/dashboard.html" class="active"><i class="fas fa-chart-line"></i> Dashboard</a>
+                <a href="/admin/menu-manage.html"><i class="fas fa-utensils"></i> Menu</a>
+                <a href="/admin/employees.html"><i class="fas fa-users"></i> Employees</a>
+                <a href="/admin/rooms.html"><i class="fas fa-bed"></i> Rooms</a>
+                <a href="/admin/reports.html"><i class="fas fa-file-alt"></i> Reports</a>
+                <a href="/staff/dashboard.html"><i class="fas fa-clipboard-list"></i> Order Queue</a>
+                <a href="/staff/inventory.html"><i class="fas fa-boxes-stacked"></i> Inventory</a>
+            </nav>
+            <div class="sidebar-footer">
+                <div class="user-info">
+                    <div class="avatar" id="user-avatar">A</div>
+                    <div>
+                        <div class="user-name" id="user-name">Admin</div>
+                        <div class="user-role" id="user-role">admin</div>
+                    </div>
+                </div>
+                <button class="btn btn-outline btn-sm w-full mt-2" onclick="logout()"><i
+                        class="fas fa-sign-out-alt"></i> Logout</button>
+            </div>
+        </aside>
+        <main class="main-content">
+            <div class="topbar">
+                <h1>Analytics Dashboard</h1>
+                <div class="topbar-actions">
+                    <button class="btn btn-outline btn-sm" onclick="loadAdminDashboard()"><i
+                            class="fas fa-sync-alt"></i> Refresh</button>
+                </div>
+            </div>
+            <div class="page-content">
+                <!-- Stats -->
+                <div class="stats-grid">
+                    <div class="stat-card orange">
+                        <div class="stat-icon"><i class="fas fa-indian-rupee-sign"></i></div>
+                        <div class="stat-info">
+                            <h3 id="stat-revenue">₹0</h3>
+                            <p>Total Revenue</p>
+                        </div>
+                    </div>
+                    <div class="stat-card blue">
+                        <div class="stat-icon"><i class="fas fa-shopping-bag"></i></div>
+                        <div class="stat-info">
+                            <h3 id="stat-orders">0</h3>
+                            <p>Total Orders</p>
+                        </div>
+                    </div>
+                    <div class="stat-card yellow">
+                        <div class="stat-icon"><i class="fas fa-clock"></i></div>
+                        <div class="stat-info">
+                            <h3 id="stat-pending">0</h3>
+                            <p>Pending Orders</p>
+                        </div>
+                    </div>
+                    <div class="stat-card green">
+                        <div class="stat-icon"><i class="fas fa-users"></i></div>
+                        <div class="stat-info">
+                            <h3 id="stat-customers">0</h3>
+                            <p>Customers</p>
+                        </div>
+                    </div>
+                    <div class="stat-card teal">
+                        <div class="stat-icon"><i class="fas fa-user-tie"></i></div>
+                        <div class="stat-info">
+                            <h3 id="stat-staff">0</h3>
+                            <p>Staff Members</p>
+                        </div>
+                    </div>
+                    <div class="stat-card red">
+                        <div class="stat-icon"><i class="fas fa-hamburger"></i></div>
+                        <div class="stat-info">
+                            <h3 id="stat-menu">0</h3>
+                            <p>Menu Items</p>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Charts -->
+                <div class="charts-grid">
+                    <div class="chart-card">
+                        <h3><i class="fas fa-chart-line text-primary"></i> Revenue — Last 7 Days</h3>
+                        <canvas id="revenue-chart"></canvas>
+                    </div>
+                    <div class="chart-card">
+                        <h3><i class="fas fa-chart-pie text-primary"></i> Orders by Status</h3>
+                        <canvas id="status-chart"></canvas>
+                    </div>
+                    <div class="chart-card">
+                        <h3><i class="fas fa-trophy text-primary"></i> Popular Items</h3>
+                        <canvas id="popular-chart"></canvas>
+                    </div>
+                    <div class="chart-card">
+                        <h3><i class="fas fa-history text-primary"></i> Recent Orders</h3>
+                        <div id="recent-orders">
+                            <div class="loading-spinner">
+                                <div class="spinner"></div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </main>
+    </div>
+    <script src="/js/utils.js"></script>
+    <script src="/js/admin.js"></script>
+    <script>if (requireAuth(['admin'])) loadAdminDashboard();</script>
+</body>
+
+</html>

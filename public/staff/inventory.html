@@ -1,0 +1,63 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Inventory — Flavour Haven</title>
+    <link rel="stylesheet" href="/css/style.css">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css">
+</head>
+
+<body>
+    <div class="app-container">
+        <aside class="sidebar">
+            <div class="sidebar-brand">
+                <h2>🍽️ Flavour Haven</h2><small>Staff Portal</small>
+            </div>
+            <nav class="sidebar-nav">
+                <a href="/staff/dashboard.html"><i class="fas fa-tachometer-alt"></i> Order Queue</a>
+                <a href="/staff/inventory.html" class="active"><i class="fas fa-boxes-stacked"></i> Inventory</a>
+            </nav>
+            <div class="sidebar-footer">
+                <div class="user-info">
+                    <div class="avatar" id="user-avatar">S</div>
+                    <div>
+                        <div class="user-name" id="user-name">Staff</div>
+                        <div class="user-role" id="user-role">staff</div>
+                    </div>
+                </div>
+                <button class="btn btn-outline btn-sm w-full mt-2" onclick="logout()"><i
+                        class="fas fa-sign-out-alt"></i> Logout</button>
+            </div>
+        </aside>
+        <main class="main-content">
+            <div class="topbar">
+                <h1>Inventory Tracking</h1>
+            </div>
+            <div class="page-content">
+                <div class="search-bar">
+                    <div class="search-wrapper">
+                        <i class="fas fa-search"></i>
+                        <input type="text" id="inv-search" class="search-input" placeholder="Search inventory..."
+                            oninput="loadInventory()">
+                    </div>
+                    <label
+                        style="display:flex;align-items:center;gap:6px;color:var(--text-secondary);font-size:0.85rem;cursor:pointer">
+                        <input type="checkbox" id="low-stock-filter" onchange="loadInventory()"> ⚠️ Low Stock Only
+                    </label>
+                </div>
+                <div id="inventory-table">
+                    <div class="loading-spinner">
+                        <div class="spinner"></div>
+                    </div>
+                </div>
+            </div>
+        </main>
+    </div>
+    <script src="/js/utils.js"></script>
+    <script src="/js/staff.js"></script>
+    <script>if (requireAuth(['staff', 'admin'])) loadInventory();</script>
+</body>
+
+</html>
